@@ -1,0 +1,61 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wrongl"
+version = "0.1.0"
+description = "WronGL — Smart bidirectional keyboard layout converter (Persian/English)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "GPLv3"}
+authors = [{name = "WronGL contributors"}]
+keywords = ["keyboard", "layout", "persian", "farsi", "converter", "typing"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: X11 Applications",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Utilities",
+]
+
+dependencies = [
+    "pyperclip>=1.8.2",
+    "wordfreq>=3.1.1",
+    "pynput>=1.7.6",
+    "customtkinter>=5.2.0",
+    "pystray>=0.19.5",
+    "pillow>=10.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "pytest-cov>=4.1",
+    "ruff>=0.1.0",
+    "pyinstaller>=6.3.0",
+]
+
+[project.scripts]
+wrongl = "wrongl.app:main"
+wrongl-cli = "wrongl.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["wrongl*"]
+
+[tool.setuptools.package-data]
+wrongl = ["resources/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --cov=wrongl --cov-report=term-missing"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
