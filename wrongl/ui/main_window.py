@@ -1,8 +1,10 @@
+# wrongl/ui/main_window.py
 from __future__ import annotations
 
 import logging
 import customtkinter as ctk
 import pyperclip
+import tkinter as tk
 from tkinter import messagebox
 
 from wrongl.config import Config, ConfigManager, resource_path
@@ -10,6 +12,7 @@ from wrongl.core.converter import Converter
 from wrongl.core.detector import detect, should_auto_convert
 from wrongl.core.hotkey import GlobalHotkey
 from wrongl.ui.settings_window import SettingsWindow
+from wrongl.ui.history_window import HistoryWindow
 
 log = logging.getLogger(__name__)
 
@@ -27,9 +30,11 @@ class MainWindow(ctk.CTk):
         self.minsize(600, 500)
         
         try:
-            self.iconbitmap(resource_path("wrongl/resources/icon.ico"))
-        except Exception:
-            pass 
+            icon_path = resource_path("wrongl/resources/icon.png")
+            self.icon_img = tk.PhotoImage(file=icon_path)
+            self.iconphoto(True, self.icon_img)
+        except Exception as e:
+            log.error(f"Failed to load icon: {e}")
         
         self.hotkey = GlobalHotkey(
             hotkey_str=self.cfg.hotkey, 
@@ -65,6 +70,7 @@ class MainWindow(ctk.CTk):
             self.switch_theme.select()
 
         ctk.CTkButton(header, text="⚙ Settings", width=80, fg_color="gray", command=self._open_settings).pack(side="right", padx=15)
+        ctk.CTkButton(header, text="🕒 History", width=80, fg_color="gray", command=self._open_history).pack(side="right")
 
         self.input_box = ctk.CTkTextbox(self, font=("Tahoma", 14), wrap="word")
         self.input_box.grid(row=1, column=0, sticky="nsew", padx=20, pady=5)
@@ -129,8 +135,18 @@ class MainWindow(ctk.CTk):
         if not text: return
         conv = self._make_converter()
         result = conv.en_to_fa(text) if direction == "en2fa" else conv.fa_to_en(text)
+        
         self.output_box.delete("1.0", "end")
         self.output_box.insert("1.0", result)
+        
+        self.cfg.history.append({
+            "input": text,
+            "output": result,
+            "direction": direction
+        })
+        if len(self.cfg.history) > self.cfg.history_size:
+            self.cfg.history.pop(0)
+        self.cfg_mgr.save()
 
     def _paste(self):
         try:
@@ -165,6 +181,9 @@ class MainWindow(ctk.CTk):
         
         hint_text = self.cfg.hotkey.replace('<', '').replace('>', '').title()
         self.hint_label.configure(text=f"Global Hotkey: {hint_text}")
+
+    def _open_history(self):
+        HistoryWindow(self, self.cfg.history)
 
     def _check_clipboard(self):
         if getattr(self.cfg, 'smart_clipboard', True):

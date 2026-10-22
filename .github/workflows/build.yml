@@ -5,7 +5,7 @@ on:
     branches: [ "main", "master" ]
   pull_request:
     branches: [ "main", "master" ]
-  workflow_dispatch: # اجازه می‌دهد دستی هم اجرا کنیم
+  workflow_dispatch:
 
 jobs:
   build:
@@ -33,9 +33,15 @@ jobs:
     - name: Run Tests
       run: pytest
 
-    - name: Build Executable with PyInstaller
+    - name: Build Executable (Windows)
+      if: matrix.os == 'windows-latest'
       run: |
-        pyinstaller --noconfirm --onefile --windowed --name WronGL --collect-data customtkinter --collect-data wordfreq wrongl/app.py
+        pyinstaller --noconfirm --onefile --windowed --icon="wrongl/resources/icon.ico" --name WronGL --add-data "wrongl/resources;wrongl/resources" --collect-data customtkinter --collect-data wordfreq wrongl/app.py
+
+    - name: Build Executable (Linux)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        pyinstaller --noconfirm --onefile --windowed --icon="wrongl/resources/icon.png" --name WronGL --add-data "wrongl/resources:wrongl/resources" --collect-data customtkinter --collect-data wordfreq wrongl/app.py
 
     - name: Upload Artifacts (Windows)
       if: matrix.os == 'windows-latest'
