@@ -11,6 +11,9 @@ class HistoryWindow(ctk.CTkToplevel):
         
         self.transient(parent)
         self.grab_set()
+        
+        self.lift()
+        self.focus_force()
 
         self._build_ui()
 

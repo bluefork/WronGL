@@ -1,4 +1,3 @@
-# wrongl/ui/main_window.py
 from __future__ import annotations
 
 import logging
@@ -65,12 +64,12 @@ class MainWindow(ctk.CTk):
         lbl_title.pack(side="left")
         
         self.switch_theme = ctk.CTkSwitch(header, text="Dark Mode", command=self._toggle_theme)
-        self.switch_theme.pack(side="right")
+        self.switch_theme.pack(side="right", padx=(10, 0))
         if self.cfg.theme == "dark":
             self.switch_theme.select()
 
-        ctk.CTkButton(header, text="⚙ Settings", width=80, fg_color="gray", command=self._open_settings).pack(side="right", padx=15)
-        ctk.CTkButton(header, text="🕒 History", width=80, fg_color="gray", command=self._open_history).pack(side="right")
+        ctk.CTkButton(header, text="⚙ Settings", width=80, fg_color="gray", command=self._open_settings).pack(side="right", padx=10)
+        ctk.CTkButton(header, text="🕒 History", width=80, fg_color="gray", command=self._open_history).pack(side="right", padx=10)
 
         self.input_box = ctk.CTkTextbox(self, font=("Tahoma", 14), wrap="word")
         self.input_box.grid(row=1, column=0, sticky="nsew", padx=20, pady=5)
@@ -172,7 +171,11 @@ class MainWindow(ctk.CTk):
         self.after(0, lambda: self.status_label.configure(text=f"Hotkey applied: {direction}", text_color="green"))
 
     def _open_settings(self):
-        SettingsWindow(self, self.cfg, self.cfg_mgr, self._on_settings_saved)
+        try:
+            SettingsWindow(self, self.cfg, self.cfg_mgr, self._on_settings_saved)
+        except Exception as e:
+            log.error(f"Settings window error: {e}")
+            messagebox.showerror("Error", f"Could not open settings: {e}")
 
     def _on_settings_saved(self):
         self.hotkey.restart(self.cfg.hotkey)
@@ -183,7 +186,11 @@ class MainWindow(ctk.CTk):
         self.hint_label.configure(text=f"Global Hotkey: {hint_text}")
 
     def _open_history(self):
-        HistoryWindow(self, self.cfg.history)
+        try:
+            HistoryWindow(self, self.cfg.history)
+        except Exception as e:
+            log.error(f"History window error: {e}")
+            messagebox.showerror("Error", f"Could not open history: {e}")
 
     def _check_clipboard(self):
         if getattr(self.cfg, 'smart_clipboard', True):
