@@ -13,7 +13,6 @@ class SettingsWindow(ctk.CTkToplevel):
         self.geometry("400x250")
         self.resizable(False, False)
         
-        # Make it modal (blocks main window)
         self.transient(parent)
         self.grab_set()
 
@@ -23,7 +22,6 @@ class SettingsWindow(ctk.CTkToplevel):
         main_frame = ctk.CTkFrame(self, fg_color="transparent")
         main_frame.pack(fill="both", expand=True, padx=20, pady=20)
 
-        # Hotkey Setting
         ctk.CTkLabel(main_frame, text="Global Hotkey (pynput format):", font=("Tahoma", 14)).pack(anchor="w", pady=(0, 5))
         
         self.hotkey_var = ctk.StringVar(value=self.cfg.hotkey)
@@ -36,15 +34,13 @@ class SettingsWindow(ctk.CTkToplevel):
             text_color="gray", font=("Tahoma", 11)
         ).pack(anchor="w", pady=(0, 15))
 
-        # Smart Clipboard Setting
         self.smart_clip_var = ctk.BooleanVar(value=getattr(self.cfg, 'smart_clipboard', True))
         ctk.CTkCheckBox(
             main_frame, 
-            text="Enable Smart Clipboard (Auto-paste copied text)", 
+            text="Enable Smart Clipboard", 
             variable=self.smart_clip_var
         ).pack(anchor="w", pady=(0, 20))
 
-        # Buttons
         btn_frame = ctk.CTkFrame(main_frame, fg_color="transparent")
         btn_frame.pack(fill="x", side="bottom")
         
@@ -61,6 +57,5 @@ class SettingsWindow(ctk.CTkToplevel):
         self.cfg.smart_clipboard = self.smart_clip_var.get()
         self.cfg_mgr.save()
         
-        # Trigger callback to update main app
         self.on_save()
         self.destroy()
