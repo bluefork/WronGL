@@ -1,19 +1,18 @@
 from __future__ import annotations
 
 import logging
-import threading
 import customtkinter as ctk
 import pyperclip
 from tkinter import messagebox
 
-from wrongl.config import Config, ConfigManager
+from wrongl.config import Config, ConfigManager, resource_path
 from wrongl.core.converter import Converter
 from wrongl.core.detector import detect, should_auto_convert
 from wrongl.core.hotkey import GlobalHotkey
+from wrongl.ui.settings_window import SettingsWindow
 
 log = logging.getLogger(__name__)
 
-# Set CustomTkinter default theme
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
 
@@ -27,7 +26,11 @@ class MainWindow(ctk.CTk):
         self.geometry(self.cfg.window_geometry)
         self.minsize(600, 500)
         
-        # Global Hotkey
+        try:
+            self.iconbitmap(resource_path("wrongl/resources/icon.ico"))
+        except Exception:
+            pass 
+        
         self.hotkey = GlobalHotkey(
             hotkey_str=self.cfg.hotkey, 
             convert_digits=self.cfg.convert_digits,
@@ -35,18 +38,21 @@ class MainWindow(ctk.CTk):
         )
         self.hotkey.start()
 
+        try:
+            self.last_clipboard = pyperclip.paste()
+        except Exception:
+            self.last_clipboard = ""
+
         self._build_ui()
+        self._check_clipboard()
         
-        # Handle window close (hide to tray instead of exiting)
         self.protocol("WM_DELETE_WINDOW", self._on_close)
 
     def _build_ui(self):
-        # Main Layout
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=1)
         self.grid_rowconfigure(3, weight=1)
 
-        # Header
         header = ctk.CTkFrame(self, fg_color="transparent")
         header.grid(row=0, column=0, sticky="ew", padx=20, pady=(15, 5))
         
@@ -58,12 +64,12 @@ class MainWindow(ctk.CTk):
         if self.cfg.theme == "dark":
             self.switch_theme.select()
 
-        # Input Textbox
+        ctk.CTkButton(header, text="⚙ Settings", width=80, fg_color="gray", command=self._open_settings).pack(side="right", padx=15)
+
         self.input_box = ctk.CTkTextbox(self, font=("Tahoma", 14), wrap="word")
         self.input_box.grid(row=1, column=0, sticky="nsew", padx=20, pady=5)
         self.input_box.bind("<KeyRelease>", lambda e: self._refresh_detection())
 
-        # Buttons Frame
         btn_frame = ctk.CTkFrame(self, fg_color="transparent")
         btn_frame.grid(row=2, column=0, sticky="ew", padx=20, pady=10)
         
@@ -74,11 +80,9 @@ class MainWindow(ctk.CTk):
         ctk.CTkButton(btn_frame, text="Paste", width=80, fg_color="gray", command=self._paste).pack(side="right", padx=5)
         ctk.CTkButton(btn_frame, text="Clear", width=80, fg_color="gray", command=self._clear).pack(side="right", padx=5)
 
-        # Output Textbox
         self.output_box = ctk.CTkTextbox(self, font=("Tahoma", 14), wrap="word", fg_color=("gray85", "gray20"))
         self.output_box.grid(row=3, column=0, sticky="nsew", padx=20, pady=5)
 
-        # Status Bar & Options
         bottom_frame = ctk.CTkFrame(self, fg_color="transparent")
         bottom_frame.grid(row=4, column=0, sticky="ew", padx=20, pady=(5, 15))
         
@@ -90,9 +94,9 @@ class MainWindow(ctk.CTk):
         
         ctk.CTkButton(bottom_frame, text="Copy", width=80, command=self._copy).pack(side="right")
         
-        # Small hint
-        hint = ctk.CTkLabel(self, text=f"Global Hotkey: {self.cfg.hotkey.replace('<', '').replace('>', '').title()}", text_color="gray", font=("Tahoma", 11))
-        hint.grid(row=5, column=0, pady=(0, 10))
+        hint_text = self.cfg.hotkey.replace('<', '').replace('>', '').title()
+        self.hint_label = ctk.CTkLabel(self, text=f"Global Hotkey: {hint_text}", text_color="gray", font=("Tahoma", 11))
+        self.hint_label.grid(row=5, column=0, pady=(0, 10))
 
     def _toggle_theme(self):
         mode = "dark" if self.switch_theme.get() else "light"
@@ -149,8 +153,36 @@ class MainWindow(ctk.CTk):
         self.status_label.configure(text="Ready", text_color="gray")
 
     def _on_hotkey_triggered(self, direction: str, result: str):
-        # Run on main thread safely using after
         self.after(0, lambda: self.status_label.configure(text=f"Hotkey applied: {direction}", text_color="green"))
+
+    def _open_settings(self):
+        SettingsWindow(self, self.cfg, self.cfg_mgr, self._on_settings_saved)
+
+    def _on_settings_saved(self):
+        self.hotkey.restart(self.cfg.hotkey)
+        self.hotkey.convert_digits = self.cfg.convert_digits
+        self.status_label.configure(text="Settings saved!", text_color="green")
+        
+        hint_text = self.cfg.hotkey.replace('<', '').replace('>', '').title()
+        self.hint_label.configure(text=f"Global Hotkey: {hint_text}")
+
+    def _check_clipboard(self):
+        if getattr(self.cfg, 'smart_clipboard', True):
+            try:
+                current_clip = pyperclip.paste()
+                if current_clip and current_clip != self.last_clipboard:
+                    self.last_clipboard = current_clip
+                    
+                    self.input_box.delete("1.0", "end")
+                    self.input_box.insert("1.0", current_clip)
+                    self._refresh_detection()
+                    
+                    self.status_label.configure(text="Auto-pasted from clipboard!", text_color="#00bfff")
+                    self.after(2000, self._refresh_detection) 
+            except Exception as e:
+                log.error(f"Clipboard polling error: {e}")
+                
+        self.after(1000, self._check_clipboard)
 
     def _on_close(self):
         self.cfg.window_geometry = self.geometry()

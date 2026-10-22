@@ -1,6 +1,4 @@
-"""Global Hotkey manager using pynput and pyperclip."""
 from __future__ import annotations
-
 import logging
 import threading
 import time
@@ -22,33 +20,28 @@ class GlobalHotkey:
 
     def _process(self):
         try:
-            # 1. Save current clipboard
             old_clip = pyperclip.paste()
             pyperclip.copy('')
             time.sleep(0.05)
 
-            # 2. Simulate Ctrl+C
             with self.kbd.pressed(keyboard.Key.ctrl):
                 self.kbd.press('c')
                 self.kbd.release('c')
             time.sleep(0.15)
 
-            # 3. Get text
             text = pyperclip.paste()
             if not text or not text.strip():
                 pyperclip.copy(old_clip)
                 return
 
-            # 4. Convert
             r = detect(text)
             direction = r.direction
-            if not should_auto_convert(r, 0.4): # Lower threshold for manual hotkey
+            if not should_auto_convert(r, 0.4):
                 direction = "en2fa" if direction == "fa2en" else "fa2en"
 
             conv = Converter(convert_digits=self.convert_digits)
             result = conv.en_to_fa(text) if direction == "en2fa" else conv.fa_to_en(text)
 
-            # 5. Paste
             pyperclip.copy(result)
             time.sleep(0.05)
             with self.kbd.pressed(keyboard.Key.ctrl):
@@ -58,7 +51,6 @@ class GlobalHotkey:
             log.info(f"Hotkey converted text. Direction: {direction}")
             if self.callback:
                 self.callback(direction, result)
-
         except Exception as e:
             log.error(f"Hotkey error: {e}")
 
@@ -68,11 +60,19 @@ class GlobalHotkey:
     def start(self):
         if self.running: return
         self.running = True
-        self.listener = keyboard.GlobalHotKeys({self.hotkey_str: self._on_activate})
-        self.listener.start()
-        log.info(f"Hotkey {self.hotkey_str} started.")
+        try:
+            self.listener = keyboard.GlobalHotKeys({self.hotkey_str: self._on_activate})
+            self.listener.start()
+            log.info(f"Hotkey {self.hotkey_str} started.")
+        except Exception as e:
+            log.error(f"Failed to start hotkey: {e}")
 
     def stop(self):
         if self.listener:
             self.listener.stop()
             self.running = False
+
+    def restart(self, new_hotkey: str):
+        self.stop()
+        self.hotkey_str = new_hotkey
+        self.start()

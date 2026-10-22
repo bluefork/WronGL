@@ -60,6 +60,7 @@ class Config:
     show_tray: bool = True
     minimize_to_tray: bool = True
     history_size: int = 20
+    smart_clipboard: bool = True  # اضافه شده برای کلیپ‌بورد هوشمند
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -103,3 +104,14 @@ class ConfigManager:
             log.debug("Config saved: %s", self.path)
         except OSError as exc:
             log.error("Failed to save config: %s", exc)
+
+
+def resource_path(relative_path: str) -> str:
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
