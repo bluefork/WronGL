@@ -25,23 +25,29 @@ jobs:
         python-version: "3.12"
         cache: "pip"
 
-    - name: Install Dependencies
+    - name: Install Linux System Dependencies
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python3-tk xclip python3-xlib libxcb-cursor0 libxkbcommon-x11-0
+
+    - name: Install Python Dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -e ".[dev]"
 
     - name: Run Tests
-      run: pytest
+      run: python -m pytest
 
     - name: Build Executable (Windows)
       if: matrix.os == 'windows-latest'
       run: |
-        pyinstaller --noconfirm --onefile --windowed --icon="wrongl/resources/icon.ico" --name WronGL --add-data "wrongl/resources;wrongl/resources" --hidden-import=pynput.keyboard._win32 --hidden-import=pynput.mouse._win32 --hidden-import=pystray._win32 --hidden-import=wrongl.ui.history_window --hidden-import=wrongl.ui.settings_window --hidden-import=arabic_reshaper --hidden-import=bidi --collect-data customtkinter --collect-data wordfreq --collect-submodules wrongl wrongl/app.py
+        python -m PyInstaller --noconfirm --onefile --windowed --icon="wrongl/resources/icon.ico" --name WronGL --add-data "wrongl/resources;wrongl/resources" --hidden-import=pynput.keyboard._win32 --hidden-import=pynput.mouse._win32 --hidden-import=pystray._win32 --hidden-import=wrongl.ui.history_window --hidden-import=wrongl.ui.settings_window --collect-all arabic_reshaper --collect-all bidi --collect-data customtkinter --collect-data wordfreq --collect-submodules wrongl wrongl/app.py
 
     - name: Build Executable (Linux)
       if: matrix.os == 'ubuntu-latest'
       run: |
-        pyinstaller --noconfirm --onefile --windowed --icon="wrongl/resources/icon.png" --name WronGL --add-data "wrongl/resources:wrongl/resources" --hidden-import=pynput.keyboard._xorg --hidden-import=pynput.mouse._xorg --hidden-import=pystray._xorg --hidden-import=wrongl.ui.history_window --hidden-import=wrongl.ui.settings_window --hidden-import=arabic_reshaper --hidden-import=bidi --collect-data customtkinter --collect-data wordfreq --collect-submodules wrongl wrongl/app.py
+        python -m PyInstaller --noconfirm --onefile --windowed --icon="wrongl/resources/icon.png" --name WronGL --add-data "wrongl/resources:wrongl/resources" --hidden-import=pynput.keyboard._xorg --hidden-import=pynput.mouse._xorg --hidden-import=pystray._xorg --hidden-import=wrongl.ui.history_window --hidden-import=wrongl.ui.settings_window --collect-all arabic_reshaper --collect-all bidi --collect-data customtkinter --collect-data wordfreq --collect-submodules wrongl wrongl/app.py
 
     - name: Upload Artifacts (Windows)
       if: matrix.os == 'windows-latest'
