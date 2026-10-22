@@ -5,6 +5,8 @@ import customtkinter as ctk
 import pyperclip
 import tkinter as tk
 from tkinter import messagebox
+import arabic_reshaper
+from bidi.algorithm import get_display
 
 from wrongl.config import Config, ConfigManager, resource_path
 from wrongl.core.converter import Converter
@@ -26,7 +28,7 @@ class MainWindow(ctk.CTk):
         
         self.title("WronGL — Layout Converter")
         self.geometry(self.cfg.window_geometry)
-        self.minsize(650, 500) # کمی بزرگتر کردم تا دکمه ها جا بشوند
+        self.minsize(650, 550)
         
         try:
             icon_path = resource_path("wrongl/resources/icon.png")
@@ -57,55 +59,54 @@ class MainWindow(ctk.CTk):
         self.grid_rowconfigure(1, weight=1)
         self.grid_rowconfigure(3, weight=1)
 
-        # Header using Grid for perfect alignment
         header = ctk.CTkFrame(self, fg_color="transparent")
         header.grid(row=0, column=0, sticky="ew", padx=20, pady=(15, 5))
         header.grid_columnconfigure(0, weight=1)
         
-        lbl_title = ctk.CTkLabel(header, text="WronGL", font=ctk.CTkFont(size=24, weight="bold"))
+        lbl_title = ctk.CTkLabel(header, text="WronGL", font=ctk.CTkFont(family="Arial", size=24, weight="bold"))
         lbl_title.grid(row=0, column=0, sticky="w")
         
         controls_frame = ctk.CTkFrame(header, fg_color="transparent")
         controls_frame.grid(row=0, column=1, sticky="e")
         
-        ctk.CTkButton(controls_frame, text="🕒 History", width=80, fg_color="gray", command=self._open_history).pack(side="left", padx=5)
-        ctk.CTkButton(controls_frame, text="⚙ Settings", width=80, fg_color="gray", command=self._open_settings).pack(side="left", padx=5)
+        ctk.CTkButton(controls_frame, text="History", width=80, fg_color="gray", command=self._open_history).pack(side="left", padx=5)
+        ctk.CTkButton(controls_frame, text="Settings", width=80, fg_color="gray", command=self._open_settings).pack(side="left", padx=5)
         
         self.switch_theme = ctk.CTkSwitch(controls_frame, text="Dark Mode", command=self._toggle_theme)
         self.switch_theme.pack(side="left", padx=(10, 0))
         if self.cfg.theme == "dark":
             self.switch_theme.select()
 
-        self.input_box = ctk.CTkTextbox(self, font=("Tahoma", 14), wrap="word")
+        self.input_box = ctk.CTkTextbox(self, font=("Arial", 14), wrap="word")
         self.input_box.grid(row=1, column=0, sticky="nsew", padx=20, pady=5)
         self.input_box.bind("<KeyRelease>", lambda e: self._refresh_detection())
 
         btn_frame = ctk.CTkFrame(self, fg_color="transparent")
         btn_frame.grid(row=2, column=0, sticky="ew", padx=20, pady=10)
         
-        ctk.CTkButton(btn_frame, text="EN → FA", width=100, command=lambda: self._run("en2fa")).pack(side="left", padx=5)
-        ctk.CTkButton(btn_frame, text="FA → EN", width=100, command=lambda: self._run("fa2en")).pack(side="left", padx=5)
-        ctk.CTkButton(btn_frame, text="Auto", width=100, fg_color="green", hover_color="darkgreen", command=self._auto_run).pack(side="left", padx=5)
+        ctk.CTkButton(btn_frame, text="EN → FA", width=90, command=lambda: self._run("en2fa")).pack(side="left", padx=5)
+        ctk.CTkButton(btn_frame, text="FA → EN", width=90, command=lambda: self._run("fa2en")).pack(side="left", padx=5)
+        ctk.CTkButton(btn_frame, text="Auto", width=90, fg_color="green", hover_color="darkgreen", command=self._auto_run).pack(side="left", padx=5)
         
-        ctk.CTkButton(btn_frame, text="Paste", width=80, fg_color="gray", command=self._paste).pack(side="right", padx=5)
-        ctk.CTkButton(btn_frame, text="Clear", width=80, fg_color="gray", command=self._clear).pack(side="right", padx=5)
+        ctk.CTkButton(btn_frame, text="Clear", width=70, fg_color="gray", command=self._clear).pack(side="right", padx=5)
+        ctk.CTkButton(btn_frame, text="Paste", width=70, fg_color="gray", command=self._paste).pack(side="right", padx=5)
 
-        self.output_box = ctk.CTkTextbox(self, font=("Tahoma", 14), wrap="word", fg_color=("gray85", "gray20"))
+        self.output_box = ctk.CTkTextbox(self, font=("Arial", 14), wrap="word", fg_color=("gray85", "gray20"))
         self.output_box.grid(row=3, column=0, sticky="nsew", padx=20, pady=5)
 
         bottom_frame = ctk.CTkFrame(self, fg_color="transparent")
         bottom_frame.grid(row=4, column=0, sticky="ew", padx=20, pady=(5, 15))
         
         self.var_digits = ctk.BooleanVar(value=self.cfg.convert_digits)
-        ctk.CTkCheckBox(bottom_frame, text="Digits", variable=self.var_digits, width=80).pack(side="left")
+        ctk.CTkCheckBox(bottom_frame, text="Digits", variable=self.var_digits, width=80, font=("Arial", 12)).pack(side="left")
         
-        self.status_label = ctk.CTkLabel(bottom_frame, text="Ready", text_color="gray")
+        self.status_label = ctk.CTkLabel(bottom_frame, text="Ready", text_color="gray", font=("Arial", 12))
         self.status_label.pack(side="left", padx=15)
         
-        ctk.CTkButton(bottom_frame, text="Copy", width=80, command=self._copy).pack(side="right")
+        ctk.CTkButton(bottom_frame, text="Copy", width=70, command=self._copy).pack(side="right")
         
         hint_text = self.cfg.hotkey.replace('<', '').replace('>', '').title()
-        self.hint_label = ctk.CTkLabel(self, text=f"Global Hotkey: {hint_text}", text_color="gray", font=("Tahoma", 11))
+        self.hint_label = ctk.CTkLabel(self, text=f"Global Hotkey: {hint_text}", text_color="gray", font=("Arial", 11))
         self.hint_label.grid(row=5, column=0, pady=(0, 10))
 
     def _toggle_theme(self):
@@ -140,8 +141,14 @@ class MainWindow(ctk.CTk):
         conv = self._make_converter()
         result = conv.en_to_fa(text) if direction == "en2fa" else conv.fa_to_en(text)
         
+        try:
+            reshaped_text = arabic_reshaper.reshape(result)
+            bidi_text = get_display(reshaped_text)
+        except Exception:
+            bidi_text = result
+
         self.output_box.delete("1.0", "end")
-        self.output_box.insert("1.0", result)
+        self.output_box.insert("1.0", bidi_text)
         
         self.cfg.history.append({
             "input": text,
@@ -203,16 +210,13 @@ class MainWindow(ctk.CTk):
                 current_clip = pyperclip.paste()
                 if current_clip and current_clip != self.last_clipboard:
                     self.last_clipboard = current_clip
-                    
                     self.input_box.delete("1.0", "end")
                     self.input_box.insert("1.0", current_clip)
                     self._refresh_detection()
-                    
                     self.status_label.configure(text="Auto-pasted from clipboard!", text_color="#00bfff")
                     self.after(2000, self._refresh_detection) 
             except Exception as e:
                 log.error(f"Clipboard polling error: {e}")
-                
         self.after(1000, self._check_clipboard)
 
     def _on_close(self):

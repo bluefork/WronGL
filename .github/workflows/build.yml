@@ -36,12 +36,12 @@ jobs:
     - name: Build Executable (Windows)
       if: matrix.os == 'windows-latest'
       run: |
-        pyinstaller --noconfirm --onefile --windowed --icon="wrongl/resources/icon.ico" --name WronGL --add-data "wrongl/resources;wrongl/resources" --hidden-import=pynput.keyboard._win32 --hidden-import=pynput.mouse._win32 --hidden-import=pystray._win32 --hidden-import=wrongl.ui.history_window --hidden-import=wrongl.ui.settings_window --collect-data customtkinter --collect-data wordfreq --collect-submodules wrongl wrongl/app.py
+        pyinstaller --noconfirm --onefile --windowed --icon="wrongl/resources/icon.ico" --name WronGL --add-data "wrongl/resources;wrongl/resources" --hidden-import=pynput.keyboard._win32 --hidden-import=pynput.mouse._win32 --hidden-import=pystray._win32 --hidden-import=wrongl.ui.history_window --hidden-import=wrongl.ui.settings_window --hidden-import=arabic_reshaper --hidden-import=bidi --collect-data customtkinter --collect-data wordfreq --collect-submodules wrongl wrongl/app.py
 
     - name: Build Executable (Linux)
       if: matrix.os == 'ubuntu-latest'
       run: |
-        pyinstaller --noconfirm --onefile --windowed --icon="wrongl/resources/icon.png" --name WronGL --add-data "wrongl/resources:wrongl/resources" --hidden-import=pynput.keyboard._xorg --hidden-import=pynput.mouse._xorg --hidden-import=pystray._xorg --hidden-import=wrongl.ui.history_window --hidden-import=wrongl.ui.settings_window --collect-data customtkinter --collect-data wordfreq --collect-submodules wrongl wrongl/app.py
+        pyinstaller --noconfirm --onefile --windowed --icon="wrongl/resources/icon.png" --name WronGL --add-data "wrongl/resources:wrongl/resources" --hidden-import=pynput.keyboard._xorg --hidden-import=pynput.mouse._xorg --hidden-import=pystray._xorg --hidden-import=wrongl.ui.history_window --hidden-import=wrongl.ui.settings_window --hidden-import=arabic_reshaper --hidden-import=bidi --collect-data customtkinter --collect-data wordfreq --collect-submodules wrongl wrongl/app.py
 
     - name: Upload Artifacts (Windows)
       if: matrix.os == 'windows-latest'

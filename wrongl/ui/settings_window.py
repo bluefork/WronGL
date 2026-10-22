@@ -15,30 +15,30 @@ class SettingsWindow(ctk.CTkToplevel):
         
         self.transient(parent)
         self.grab_set()
-
         self._build_ui()
 
     def _build_ui(self):
         main_frame = ctk.CTkFrame(self, fg_color="transparent")
         main_frame.pack(fill="both", expand=True, padx=20, pady=20)
 
-        ctk.CTkLabel(main_frame, text="Global Hotkey (pynput format):", font=("Tahoma", 14)).pack(anchor="w", pady=(0, 5))
+        ctk.CTkLabel(main_frame, text="Global Hotkey:", font=("Arial", 14)).pack(anchor="w", pady=(0, 5))
         
         self.hotkey_var = ctk.StringVar(value=self.cfg.hotkey)
-        hotkey_entry = ctk.CTkEntry(main_frame, textvariable=self.hotkey_var, font=("Consolas", 14))
+        hotkey_entry = ctk.CTkEntry(main_frame, textvariable=self.hotkey_var, font=("Arial", 14))
         hotkey_entry.pack(fill="x", pady=(0, 10))
         
         ctk.CTkLabel(
             main_frame, 
-            text="Example: <ctrl>+<shift>+l or <ctrl>+<alt>+w", 
-            text_color="gray", font=("Tahoma", 11)
+            text="Example: <ctrl>+<shift>+l", 
+            text_color="gray", font=("Arial", 11)
         ).pack(anchor="w", pady=(0, 15))
 
         self.smart_clip_var = ctk.BooleanVar(value=getattr(self.cfg, 'smart_clipboard', True))
         ctk.CTkCheckBox(
             main_frame, 
             text="Enable Smart Clipboard", 
-            variable=self.smart_clip_var
+            variable=self.smart_clip_var,
+            font=("Arial", 12)
         ).pack(anchor="w", pady=(0, 20))
 
         btn_frame = ctk.CTkFrame(main_frame, fg_color="transparent")
@@ -52,10 +52,8 @@ class SettingsWindow(ctk.CTkToplevel):
         if not new_hotkey:
             messagebox.showerror("Error", "Hotkey cannot be empty.")
             return
-
         self.cfg.hotkey = new_hotkey
         self.cfg.smart_clipboard = self.smart_clip_var.get()
         self.cfg_mgr.save()
-        
         self.on_save()
         self.destroy()
