@@ -14,6 +14,8 @@ class HistoryWindow(ctk.CTkToplevel):
         
         self.lift()
         self.focus_force()
+        self.attributes('-topmost', True)
+        self.after(200, lambda: self.attributes('-topmost', False))
 
         self._build_ui()
 

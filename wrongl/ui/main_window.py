@@ -26,7 +26,7 @@ class MainWindow(ctk.CTk):
         
         self.title("WronGL — Layout Converter")
         self.geometry(self.cfg.window_geometry)
-        self.minsize(600, 500)
+        self.minsize(650, 500) # کمی بزرگتر کردم تا دکمه ها جا بشوند
         
         try:
             icon_path = resource_path("wrongl/resources/icon.png")
@@ -57,19 +57,24 @@ class MainWindow(ctk.CTk):
         self.grid_rowconfigure(1, weight=1)
         self.grid_rowconfigure(3, weight=1)
 
+        # Header using Grid for perfect alignment
         header = ctk.CTkFrame(self, fg_color="transparent")
         header.grid(row=0, column=0, sticky="ew", padx=20, pady=(15, 5))
+        header.grid_columnconfigure(0, weight=1)
         
         lbl_title = ctk.CTkLabel(header, text="WronGL", font=ctk.CTkFont(size=24, weight="bold"))
-        lbl_title.pack(side="left")
+        lbl_title.grid(row=0, column=0, sticky="w")
         
-        self.switch_theme = ctk.CTkSwitch(header, text="Dark Mode", command=self._toggle_theme)
-        self.switch_theme.pack(side="right", padx=(10, 0))
+        controls_frame = ctk.CTkFrame(header, fg_color="transparent")
+        controls_frame.grid(row=0, column=1, sticky="e")
+        
+        ctk.CTkButton(controls_frame, text="🕒 History", width=80, fg_color="gray", command=self._open_history).pack(side="left", padx=5)
+        ctk.CTkButton(controls_frame, text="⚙ Settings", width=80, fg_color="gray", command=self._open_settings).pack(side="left", padx=5)
+        
+        self.switch_theme = ctk.CTkSwitch(controls_frame, text="Dark Mode", command=self._toggle_theme)
+        self.switch_theme.pack(side="left", padx=(10, 0))
         if self.cfg.theme == "dark":
             self.switch_theme.select()
-
-        ctk.CTkButton(header, text="⚙ Settings", width=80, fg_color="gray", command=self._open_settings).pack(side="right", padx=10)
-        ctk.CTkButton(header, text="🕒 History", width=80, fg_color="gray", command=self._open_history).pack(side="right", padx=10)
 
         self.input_box = ctk.CTkTextbox(self, font=("Tahoma", 14), wrap="word")
         self.input_box.grid(row=1, column=0, sticky="nsew", padx=20, pady=5)
