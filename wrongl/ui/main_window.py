@@ -25,6 +25,7 @@ class MainWindow(ctk.CTk):
         super().__init__()
         self.cfg = cfg
         self.cfg_mgr = cfg_mgr
+        self.raw_output = ""
         
         self.title("WronGL — Layout Converter")
         self.geometry(self.cfg.window_geometry)
@@ -141,6 +142,8 @@ class MainWindow(ctk.CTk):
         conv = self._make_converter()
         result = conv.en_to_fa(text) if direction == "en2fa" else conv.fa_to_en(text)
         
+        self.raw_output = result
+        
         try:
             reshaped_text = arabic_reshaper.reshape(result)
             bidi_text = get_display(reshaped_text)
@@ -169,12 +172,12 @@ class MainWindow(ctk.CTk):
             messagebox.showerror("Error", f"Clipboard error: {e}")
 
     def _copy(self):
-        text = self.output_box.get("1.0", "end-1c")
-        if text:
-            pyperclip.copy(text)
+        if self.raw_output:
+            pyperclip.copy(self.raw_output)
             self.status_label.configure(text="Copied to clipboard!", text_color="green")
 
     def _clear(self):
+        self.raw_output = ""
         self.input_box.delete("1.0", "end")
         self.output_box.delete("1.0", "end")
         self.status_label.configure(text="Ready", text_color="gray")

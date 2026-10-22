@@ -38,7 +38,8 @@ class HistoryWindow(ctk.CTkToplevel):
             frame.pack(fill="x", pady=5, padx=5)
             
             inp = item.get("input", "").replace("\n", " ")[:25]
-            out = item.get("output", "").replace("\n", " ")[:25]
+            raw_out = item.get("output", "")
+            out = raw_out.replace("\n", " ")[:25]
             dir = item.get("direction", "")
             
             try:
@@ -51,5 +52,5 @@ class HistoryWindow(ctk.CTkToplevel):
             lbl = ctk.CTkLabel(frame, text=lbl_text, anchor="w", font=("Arial", 12))
             lbl.pack(side="left", padx=10, pady=10, fill="x", expand=True)
             
-            btn = ctk.CTkButton(frame, text="Copy", width=60, command=lambda t=item.get("output", ""): pyperclip.copy(t))
+            btn = ctk.CTkButton(frame, text="Copy", width=60, command=lambda t=raw_out: pyperclip.copy(t))
             btn.pack(side="right", padx=10)
