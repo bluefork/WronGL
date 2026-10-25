@@ -31,13 +31,6 @@ class MainWindow(ctk.CTk):
         self.geometry(self.cfg.window_geometry)
         self.minsize(650, 550)
         
-        try:
-            icon_path = resource_path("wrongl/resources/icon.png")
-            self.icon_img = tk.PhotoImage(file=icon_path)
-            self.iconphoto(True, self.icon_img)
-        except Exception as e:
-            log.error(f"Failed to load icon: {e}")
-        
         self.hotkey = GlobalHotkey(
             hotkey_str=self.cfg.hotkey, 
             convert_digits=self.cfg.convert_digits,
@@ -90,10 +83,11 @@ class MainWindow(ctk.CTk):
         ctk.CTkButton(btn_frame, text="Auto", width=90, fg_color="green", hover_color="darkgreen", command=self._auto_run).pack(side="left", padx=5)
         
         ctk.CTkButton(btn_frame, text="Clear", width=70, fg_color="gray", command=self._clear).pack(side="right", padx=5)
-        ctk.CTkButton(btn_frame, text="Paste", width=70, fg_color="gray", command=self._paste).pack(side="right", padx=5)
+        ctk.CTkButton(btn_frame, text="Paste", width=70, fg_color="#E67E22", hover_color="#D35400", command=self._paste).pack(side="right", padx=5)
 
         self.output_box = ctk.CTkTextbox(self, font=("Arial", 14), wrap="word", fg_color=("gray85", "gray20"))
         self.output_box.grid(row=3, column=0, sticky="nsew", padx=20, pady=5)
+        self.output_box._textbox.tag_configure("rtl", justify="right")
 
         bottom_frame = ctk.CTkFrame(self, fg_color="transparent")
         bottom_frame.grid(row=4, column=0, sticky="ew", padx=20, pady=(5, 15))
@@ -151,7 +145,8 @@ class MainWindow(ctk.CTk):
             bidi_text = result
 
         self.output_box.delete("1.0", "end")
-        self.output_box.insert("1.0", bidi_text)
+        self.output_box.insert("1.0", "\u200F" + bidi_text)
+        self.output_box._textbox.tag_add("rtl", "1.0", "end")
         
         self.cfg.history.append({
             "input": text,

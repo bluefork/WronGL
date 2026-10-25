@@ -39,7 +39,6 @@ jobs:
     - name: Run Tests
       run: python -m pytest
 
-    # --- WINDOWS BUILD & INSTALLER ---
     - name: Build Executable (Windows)
       if: matrix.os == 'windows-latest'
       run: |
@@ -51,7 +50,6 @@ jobs:
         choco install innosetup -y
         & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer.iss
 
-    # --- LINUX BUILD & INSTALLER ---
     - name: Build Executable (Linux)
       if: matrix.os == 'ubuntu-latest'
       run: |
@@ -63,17 +61,16 @@ jobs:
         chmod +x build_deb.sh
         ./build_deb.sh
 
-    # --- UPLOAD ARTIFACTS ---
     - name: Upload Windows Installer
       if: matrix.os == 'windows-latest'
       uses: actions/upload-artifact@v4
       with:
         name: WronGL-Windows-Installer
-        path: installer_out/WronGL_Setup_v1.0.0.exe
+        path: installer_out/WronGL_Setup_v1.0.exe
 
     - name: Upload Linux .deb Installer
       if: matrix.os == 'ubuntu-latest'
       uses: actions/upload-artifact@v4
       with:
         name: WronGL-Linux-Deb
-        path: dist/WronGL_v1.0.0_amd64.deb
+        path: dist/WronGL_v1.0_amd64.deb

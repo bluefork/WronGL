@@ -29,7 +29,7 @@ class SettingsWindow(ctk.CTkToplevel):
         
         ctk.CTkLabel(
             main_frame, 
-            text="Example: <ctrl>+<shift>+l", 
+            text="Example: <cmd>+<alt>+k", 
             text_color="gray", font=("Arial", 11)
         ).pack(anchor="w", pady=(0, 15))
 

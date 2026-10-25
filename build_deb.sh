@@ -3,7 +3,7 @@ set -e
 
 # Define variables
 APP_NAME="wrongl"
-VERSION="1.0.0"
+VERSION="1.0"
 ARCH="amd64"
 DEB_DIR="build_deb/${APP_NAME}_${VERSION}_${ARCH}"
 

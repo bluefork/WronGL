@@ -1,7 +1,7 @@
 [Setup]
 AppId={{8B7A3E4F-5C2D-4A1B-9E8F-7D6C5B4A3F2E}
 AppName=WronGL
-AppVersion=1.0.0
+AppVersion=1.0
 AppPublisher=WronGL Contributors
 AppPublisherURL=https://github.com/bluefork/WronGL
 AppSupportURL=https://github.com/bluefork/WronGL/issues
@@ -10,7 +10,7 @@ DefaultDirName={autopf}\WronGL
 DisableProgramGroupPage=yes
 LicenseFile=LICENSE
 OutputDir=installer_out
-OutputBaseFilename=WronGL_Setup_v1.0.0
+OutputBaseFilename=WronGL_Setup_v1.0
 SetupIconFile=wrongl\resources\icon.ico
 Compression=lzma
 SolidCompression=yes

@@ -1,50 +1,30 @@
 import os
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image
 
-def create_icon():
+def process_logo():
+    logo_path = "wrongl/resources/logo.png"
+    if not os.path.exists(logo_path):
+        print("Error: Please save your custom logo as 'logo.png' inside 'wrongl/resources/' first.")
+        return
+
+    print("Processing custom logo...")
+    img = Image.open(logo_path).convert("RGBA")
+    
     size = 512
-    image = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(image)
-
-    white = (255, 255, 255, 255)
-    orange = (255, 120, 0, 255)
-    text_color = (30, 30, 30, 255)
-
-    padding = 16
-    draw.ellipse([(padding, padding), (size-padding, size-padding)], fill=orange)
-
-    border_width = 32
-    draw.ellipse(
-        [(padding+border_width, padding+border_width), 
-         (size-padding-border_width, size-padding-border_width)], 
-        fill=white
-    )
-
-    try:
-        font = ImageFont.truetype("arialbd.ttf", 130)
-    except IOError:
-        try:
-            font = ImageFont.truetype("arial.ttf", 130)
-        except IOError:
-            font = ImageFont.load_default()
-
-    text = "WGL"
-    bbox = draw.textbbox((0, 0), text, font=font)
-    text_width = bbox[2] - bbox[0]
-    text_height = bbox[3] - bbox[1]
+    canvas = Image.new("RGBA", (size, size), (0, 0, 0, 0))
     
-    x = (size - text_width) / 2
-    y = (size - text_height) / 2 - bbox[1]
+    img.thumbnail((400, 400), Image.Resampling.LANCZOS)
     
-    draw.text((x, y), text, fill=text_color, font=font)
-
-    os.makedirs("wrongl/resources", exist_ok=True)
-    image.save("wrongl/resources/icon.png")
+    x = (size - img.width) // 2
+    y = (size - img.height) // 2
+    canvas.paste(img, (x, y), img)
+    
+    canvas.save("wrongl/resources/icon.png")
     
     icon_sizes = [(16, 16), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)]
-    image.save("wrongl/resources/icon.ico", format="ICO", sizes=icon_sizes)
+    canvas.save("wrongl/resources/icon.ico", format="ICO", sizes=icon_sizes)
     
-    print("High-resolution icon generated in wrongl/resources/")
+    print("Success! High-quality icons generated in wrongl/resources/")
 
 if __name__ == "__main__":
-    create_icon()
+    process_logo()

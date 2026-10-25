@@ -10,7 +10,7 @@ from wrongl.core.detector import detect, should_auto_convert
 log = logging.getLogger(__name__)
 
 class GlobalHotkey:
-    def __init__(self, hotkey_str: str = "<ctrl>+<shift>+l", convert_digits: bool = False, callback=None):
+    def __init__(self, hotkey_str: str = "<cmd>+<alt>+k", convert_digits: bool = False, callback=None):
         self.hotkey_str = hotkey_str
         self.convert_digits = convert_digits
         self.callback = callback
@@ -19,6 +19,8 @@ class GlobalHotkey:
         self.kbd = keyboard.Controller()
 
     def _process(self):
+        # Wait for user to release the modifier keys (Win, Alt, K)
+        time.sleep(0.15)
         try:
             old_clip = pyperclip.paste()
             pyperclip.copy('')
@@ -27,7 +29,7 @@ class GlobalHotkey:
             with self.kbd.pressed(keyboard.Key.ctrl):
                 self.kbd.press('c')
                 self.kbd.release('c')
-            time.sleep(0.15)
+            time.sleep(0.2)
 
             text = pyperclip.paste()
             if not text or not text.strip():
@@ -43,12 +45,12 @@ class GlobalHotkey:
             result = conv.en_to_fa(text) if direction == "en2fa" else conv.fa_to_en(text)
 
             pyperclip.copy(result)
-            time.sleep(0.05)
+            time.sleep(0.1)
             with self.kbd.pressed(keyboard.Key.ctrl):
                 self.kbd.press('v')
                 self.kbd.release('v')
 
-            log.info(f"Hotkey converted text. Direction: {direction}")
+            log.info(f"Hotkey converted text successfully.")
             if self.callback:
                 self.callback(direction, result)
         except Exception as e:

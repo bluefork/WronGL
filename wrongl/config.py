@@ -1,4 +1,3 @@
-"""Configuration management for WronGL."""
 from __future__ import annotations
 
 import json
@@ -43,7 +42,7 @@ LOG_DIR = _user_log_dir()
 @dataclass
 class Config:
     version: int = CONFIG_VERSION
-    hotkey: str = "<ctrl>+<shift>+l"
+    hotkey: str = "<cmd>+<alt>+k"
     layout_profile: str = "windows"
     convert_digits: bool = False
     convert_punctuation: bool = False

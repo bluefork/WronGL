@@ -47,7 +47,7 @@ class HistoryWindow(ctk.CTkToplevel):
             except Exception:
                 res_out = out
 
-            lbl_text = f"[{dir}] {inp} -> {res_out}"
+            lbl_text = f"[{dir}] {inp} | {res_out}"
             
             lbl = ctk.CTkLabel(frame, text=lbl_text, anchor="w", font=("Arial", 12))
             lbl.pack(side="left", padx=10, pady=10, fill="x", expand=True)
