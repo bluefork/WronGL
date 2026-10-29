@@ -1,3 +1,4 @@
+"""Configuration management for WronGL."""
 from __future__ import annotations
 
 import json
@@ -11,7 +12,7 @@ from typing import Any
 log = logging.getLogger(__name__)
 
 APP_NAME = "WronGL"
-CONFIG_VERSION = 1
+CONFIG_VERSION = 2
 
 def _user_config_dir() -> Path:
     if sys.platform == "win32":
@@ -76,8 +77,12 @@ class ConfigManager:
             if self.path.exists():
                 raw = json.loads(self.path.read_text(encoding="utf-8"))
                 version = int(raw.get("version", 0))
+                
                 if version < CONFIG_VERSION:
+                    log.info("Migrating config from v%s to v%s", version, CONFIG_VERSION)
                     raw["version"] = CONFIG_VERSION
+                    raw["hotkey"] = "<cmd>+<alt>+k"
+                    
                 self.config = Config.from_dict(raw)
             else:
                 self.save()

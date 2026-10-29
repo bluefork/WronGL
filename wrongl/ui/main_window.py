@@ -3,12 +3,11 @@ from __future__ import annotations
 import logging
 import customtkinter as ctk
 import pyperclip
-import tkinter as tk
 from tkinter import messagebox
 import arabic_reshaper
 from bidi.algorithm import get_display
 
-from wrongl.config import Config, ConfigManager, resource_path
+from wrongl.config import Config, ConfigManager
 from wrongl.core.converter import Converter
 from wrongl.core.detector import detect, should_auto_convert
 from wrongl.core.hotkey import GlobalHotkey

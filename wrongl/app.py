@@ -1,4 +1,3 @@
-# wrongl/app.py
 from __future__ import annotations
 import logging
 import sys
@@ -14,13 +13,10 @@ def main() -> int:
         cfg_mgr = ConfigManager()
         cfg = cfg_mgr.load()
         
-        # وارد کردن UI
         from wrongl.ui.main_window import MainWindow
         
-        # ساخت پنجره اصلی
         app = MainWindow(cfg, cfg_mgr)
         
-        # راه‌اندازی Tray
         from wrongl.ui.tray import TrayIcon
         
         def show_window():
@@ -32,7 +28,6 @@ def main() -> int:
         tray = TrayIcon(on_show=show_window, on_quit=quit_app)
         tray.start()
 
-        # اجرای برنامه
         app.mainloop()
         tray.stop()
         return 0
