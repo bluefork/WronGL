@@ -6,9 +6,8 @@
 
 [![Build](https://github.com/BlueFork/WronGL/actions/workflows/build.yml/badge.svg)](https://github.com/BlueFork/WronGL/actions/workflows/build.yml)
 [![Python Version](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux-lightgrey.svg)]()
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-purple.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-orange.svg)](http://makeapullrequest.com)
 
 </div>
 
@@ -23,7 +22,7 @@ Instead of just mapping characters blindly, WronGL employs **lexical scoring and
 ## ✨ Key Features
 
 - **🧠 Smart Lexical Detection:** Uses statistical language models to guess the intended language based on word frequencies, rather than simple character ratios.
-- **⚡ Global Hotkey:** Select mistyped text in *any* application (browser, IDE, Word) and press `Ctrl + Shift + L` to convert and replace it instantly.
+- **⚡ Global Hotkey:** Select mistyped text in *any* application (browser, IDE, Word) and press `Win + Alt + K` to convert and replace it instantly.
 - **🎨 Modern & Responsive UI:** Built with `CustomTkinter`, featuring a sleek dark/light mode interface.
 - **📌 System Tray Support:** Runs quietly in the background. Closing the window minimizes it to the system tray.
 - **💻 Command-Line Interface (CLI):** A fully-featured CLI `wrongl-cli` for pipeline integration and terminal usage.
@@ -94,7 +93,7 @@ python -m wrongl
 
    - Highlight any mistyped text in any application.
 
-   - Press `Ctrl + Shift + L` (Default).
+   - Press `Win + Alt + K` (Default).
 
    - The text will be converted, and the correct string will automatically replace your selection.
 
